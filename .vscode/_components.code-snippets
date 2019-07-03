@@ -1,0 +1,40 @@
+{
+  "base-button": {
+    "scope": "vue-html",
+    "prefix": "base-button",
+    "body": ["<base-button>", "\t${3}", "</base-button>"],
+    "description": "<base-button>"
+  },
+  "base-icon": {
+    "scope": "vue-html",
+    "prefix": "base-icon",
+    "body": ["<base-icon name=\"${1}\">", "\t${2}", "</base-icon>"],
+    "description": "<base-icon>"
+  },
+  "base-input": {
+    "scope": "vue-html",
+    "prefix": "base-input",
+    "body": ["<base-input ${1}/>"],
+    "description": "<base-input>"
+  },
+  "base-link": {
+    "scope": "vue-html",
+    "prefix": "base-link",
+    "body": [
+      "<base-link ${1|name,:to,href|}=\"${2:route}\">",
+      "\t${3}",
+      "</base-link>"
+    ],
+    "description": "<base-link>"
+  },
+  "base-icon-link": {
+    "scope": "vue-html",
+    "prefix": "base-icon-link",
+    "body": [
+      "<base-icon-link ${1|name,:to,href|}=\"${2:route}\">",
+      "\t${3}",
+      "</base-icon-link>"
+    ],
+    "description": "<base-icon-link>"
+  }
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "Satellite",
+    "style": "satellite",
+    "thumbnail": "Satellite"
+  },
+  {
+    "id": 2,
+    "name": "Dark",
+    "style": "dark",
+    "thumbnail": "Dark"
+  },
+  {
+    "id": 3,
+    "name": "Streets",
+    "style": "streets",
+    "thumbnail": "Voyager"
+  },
+  {
+    "id": 4,
+    "name": "Light",
+    "style": "light",
+    "thumbnail": "Positron"
+  },
+  {
+    "id": 5,
+    "name": "Basic",
+    "style": "basic",
+    "thumbnail": "Basic"
+  },
+  {
+    "id": 6,
+    "name": "Bright",
+    "style": "bright",
+    "thumbnail": "Positron"
+  }
+]
