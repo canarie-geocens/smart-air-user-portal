@@ -9,10 +9,12 @@
           <div class="row pb-3">
             <div class="col-3">
               <b-form-input
+                v-model="searchInputTxt"
                 class="bottom-line"
                 size="sm"
-                type="text"
+                type="search"
                 placeholder="All Show"
+                autocomplete="off"
               />
             </div>
             <div class="col-9">
@@ -25,7 +27,7 @@
               </router-link>
             </div>
           </div>
-          <sensor-list v-if="sensors" :sensors-list="sensors" />
+          <sensor-list v-if="sensors" :sensors-list="filterSensors" />
         </div>
       </div>
     </main-content>
@@ -43,6 +45,11 @@ export default {
     meta: [{ name: 'description', content: 'Sensors' }],
   },
   components: { Layout, MainContent, SensorList },
+  data() {
+    return {
+      searchInputTxt: '',
+    }
+  },
   computed: {
     ...mapGetters({
       staData: 'map/staData',
@@ -66,6 +73,36 @@ export default {
       } else {
         return null
       }
+    },
+    filterSensors: function() {
+      let searchValue = this.searchInputTxt.toLowerCase().replace(/\s/g, '')
+
+      // Filtering each item (MAC, name and location) based on the input value
+      let filteredMAC = this.sensors.filter(
+        (s) => s.MAC.toLowerCase().indexOf(searchValue) > -1
+      )
+      let filteredName = this.sensors.filter(
+        (s) => s.name.toLowerCase().indexOf(searchValue) > -1
+      )
+      let filteredLocation = this.sensors.filter(
+        (s) => s.location.toLowerCase().indexOf(searchValue) > -1
+      )
+
+      // Merging the results
+      let filteredSensors = filteredMAC
+        .concat(filteredName)
+        .concat(filteredLocation)
+
+      // Removing duplicated values
+      var uniquedFilteredSensors = filteredSensors.concat()
+      for (var i = 0; i < uniquedFilteredSensors.length; ++i) {
+        for (var j = i + 1; j < uniquedFilteredSensors.length; ++j) {
+          if (uniquedFilteredSensors[i] === uniquedFilteredSensors[j])
+            uniquedFilteredSensors.splice(j--, 1)
+        }
+      }
+
+      return uniquedFilteredSensors
     },
   },
 }
