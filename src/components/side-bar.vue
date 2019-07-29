@@ -15,11 +15,6 @@
           />
         </a>
         <nav-bar-routes :routes="persistentNavRoutes" />
-        <li v-if="profile" class="nav-item bottom-item">
-          <router-link to="/profile"
-            ><img :src="profile.picture" class="profilePicture img-fluid"
-          /></router-link>
-        </li>
       </ul>
     </div>
   </nav>
@@ -55,17 +50,6 @@ export default {
     getIcon(icon) {
       return icon + 'Icon'
     },
-    handleLoginEvent(data) {
-      this.profile = data.profile
-    },
   },
 }
 </script>
-
-<style lang="scss">
-.profilePicture {
-  width: 43px;
-  height: 43px;
-  border-radius: 50%;
-}
-</style>
