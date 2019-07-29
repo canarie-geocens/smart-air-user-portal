@@ -8,14 +8,20 @@
         <div class="main-content-padding">
           <div class="row pb-3">
             <div class="col-3">
-              <b-form-input
-                v-model="searchInputTxt"
-                class="bottom-line"
-                size="sm"
-                type="search"
-                placeholder="All Show"
-                autocomplete="off"
-              />
+              <div class="input-group">
+                <div>
+                  <search-icon size="1.5x" class="custom-class"></search-icon>
+                </div>
+                <b-form-input
+                  v-model="searchInputTxt"
+                  class="bottom-line  with-icon"
+                  size="sm"
+                  type="search"
+                  placeholder="Search"
+                  autocomplete="off"
+                  state="true"
+                />
+              </div>
             </div>
             <div class="col-9">
               <router-link
@@ -39,12 +45,14 @@ import { mapGetters } from 'vuex'
 import Layout from '@layouts/main'
 import MainContent from '@layouts/main-content'
 import SensorList from '@components/sensor/sensor-list.vue'
+import { SearchIcon } from 'vue-feather-icons'
+
 export default {
   page: {
     title: 'Sensors',
     meta: [{ name: 'description', content: 'Sensors' }],
   },
-  components: { Layout, MainContent, SensorList },
+  components: { Layout, MainContent, SensorList, SearchIcon },
   data() {
     return {
       searchInputTxt: '',
