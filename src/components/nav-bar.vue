@@ -19,22 +19,6 @@ export default {
           title: 'Home',
         },
       ],
-      loggedInNavRoutes: [
-        {
-          name: 'profile',
-          title: () => 'Logged in as ' + this.currentUser.name,
-        },
-        {
-          name: 'logout',
-          title: 'Log out',
-        },
-      ],
-      loggedOutNavRoutes: [
-        {
-          name: 'login',
-          title: 'Log in',
-        },
-      ],
     }
   },
 }

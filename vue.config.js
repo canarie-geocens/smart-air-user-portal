@@ -43,7 +43,6 @@ module.exports = {
       cloudfrontId: process.env.VUE_APP_S3D_CLOUDFRONT_ID,
       cloudfrontMatchers: '/*',
       uploadConcurrency: 5,
-      awsProfile: 'default',
       createBucket: false,
       staticHosting: true,
       staticIndexPage: 'index.html',
