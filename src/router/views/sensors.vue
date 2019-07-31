@@ -46,6 +46,7 @@ import Layout from '@layouts/main'
 import MainContent from '@layouts/main-content'
 import SensorList from '@components/sensor/sensor-list.vue'
 import { SearchIcon } from 'vue-feather-icons'
+import _ from 'lodash'
 
 export default {
   page: {
@@ -102,13 +103,7 @@ export default {
         .concat(filteredLocation)
 
       // Removing duplicated values
-      var uniquedFilteredSensors = filteredSensors.concat()
-      for (var i = 0; i < uniquedFilteredSensors.length; ++i) {
-        for (var j = i + 1; j < uniquedFilteredSensors.length; ++j) {
-          if (uniquedFilteredSensors[i] === uniquedFilteredSensors[j])
-            uniquedFilteredSensors.splice(j--, 1)
-        }
-      }
+      let uniquedFilteredSensors = _.uniq(filteredSensors)
 
       return uniquedFilteredSensors
     },
