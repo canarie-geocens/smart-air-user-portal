@@ -8,12 +8,20 @@
         <div class="main-content-padding">
           <div class="row pb-3">
             <div class="col-3">
-              <b-form-input
-                class="bottom-line"
-                size="sm"
-                type="text"
-                placeholder="All Show"
-              />
+              <div class="input-group">
+                <div>
+                  <search-icon size="1.5x" class="custom-class"></search-icon>
+                </div>
+                <b-form-input
+                  v-model="searchInputTxt"
+                  class="bottom-line  with-icon"
+                  size="sm"
+                  type="search"
+                  placeholder="Search"
+                  autocomplete="off"
+                  state="true"
+                />
+              </div>
             </div>
             <div class="col-9">
               <router-link
@@ -25,7 +33,7 @@
               </router-link>
             </div>
           </div>
-          <sensor-list v-if="sensors" :sensors-list="sensors" />
+          <sensor-list v-if="sensors" :sensors-list="filterSensors" />
         </div>
       </div>
     </main-content>
@@ -37,12 +45,20 @@ import { mapGetters } from 'vuex'
 import Layout from '@layouts/main'
 import MainContent from '@layouts/main-content'
 import SensorList from '@components/sensor/sensor-list.vue'
+import { SearchIcon } from 'vue-feather-icons'
+import _ from 'lodash'
+
 export default {
   page: {
     title: 'Sensors',
     meta: [{ name: 'description', content: 'Sensors' }],
   },
-  components: { Layout, MainContent, SensorList },
+  components: { Layout, MainContent, SensorList, SearchIcon },
+  data() {
+    return {
+      searchInputTxt: '',
+    }
+  },
   computed: {
     ...mapGetters({
       staData: 'map/staData',
@@ -66,6 +82,30 @@ export default {
       } else {
         return null
       }
+    },
+    filterSensors: function() {
+      let searchValue = this.searchInputTxt.toLowerCase().replace(/\s/g, '')
+
+      // Filtering each item (MAC, name and location) based on the input value
+      let filteredMAC = this.sensors.filter(
+        (s) => s.MAC.toLowerCase().indexOf(searchValue) > -1
+      )
+      let filteredName = this.sensors.filter(
+        (s) => s.name.toLowerCase().indexOf(searchValue) > -1
+      )
+      let filteredLocation = this.sensors.filter(
+        (s) => s.location.toLowerCase().indexOf(searchValue) > -1
+      )
+
+      // Merging the results
+      let filteredSensors = filteredMAC
+        .concat(filteredName)
+        .concat(filteredLocation)
+
+      // Removing duplicated values
+      let uniquedFilteredSensors = _.uniq(filteredSensors)
+
+      return uniquedFilteredSensors
     },
   },
 }
