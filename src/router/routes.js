@@ -15,6 +15,11 @@ export default [
     component: () => lazyLoadView(import('@views/register')),
   },
   {
+    path: '/sensors/download/:myProperty',
+    name: 'download',
+    component: () => lazyLoadView(import('@views/download')),
+  },
+  {
     path: '/404',
     name: '404',
     component: require('@views/_404').default,
