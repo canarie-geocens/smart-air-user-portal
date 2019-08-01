@@ -6382,6 +6382,11 @@ flat-cache@^2.0.1:
     rimraf "2.6.3"
     write "1.0.3"
 
+flatpickr@^4.5.1:
+  version "4.6.2"
+  resolved "https://registry.yarnpkg.com/flatpickr/-/flatpickr-4.6.2.tgz#50e1b4fc84fbf67c5b0919ba3ddc330221f126da"
+  integrity sha512-bRfBPyxohUQWgCTg6jPALUO1t/x+sRJ/S/RVti/NzYvHqGRpCAesKSWKLzOuLmpu+vGHfXBld4SXvOCLFgYb+g==
+
 flatted@^2.0.0:
   version "2.0.1"
   resolved "https://registry.npmjs.org/flatted/-/flatted-2.0.1.tgz#69e57caa8f0eacbc281d2e2cb458d46fdb449e08"
@@ -14052,6 +14057,13 @@ vue-feather-icons@^4.10.0:
   integrity sha512-ZG8FSFPUYoNet9jjXJFLiTnEH8eCp5Pj0FchtxjTPP6D4qPfcbFFnKDusT+xDj/0zilnuVCLVn/GAghs7k5fCg==
   dependencies:
     babel-helper-vue-jsx-merge-props "^2.0.2"
+
+vue-flatpickr-component@^8.1.2:
+  version "8.1.2"
+  resolved "https://registry.yarnpkg.com/vue-flatpickr-component/-/vue-flatpickr-component-8.1.2.tgz#c8bcfa95a4da4e528f4850141cb0ad7b628a1d6d"
+  integrity sha512-z3FPLrkQgrTXWU3YZ8pcVQ9Gu4CLKUoBQWqK2i3HIhNFcXnwbfY/btf+Uk8zr9Csotrbzw1NWl/WglbW8Zn/Hg==
+  dependencies:
+    flatpickr "^4.5.1"
 
 vue-functional-data-merge@^3.1.0:
   version "3.1.0"

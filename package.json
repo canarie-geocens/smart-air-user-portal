@@ -47,6 +47,7 @@
     "vue": "2.6.6",
     "vue-bus": "^1.2.0",
     "vue-feather-icons": "^4.10.0",
+    "vue-flatpickr-component": "^8.1.2",
     "vue-json-excel": "^0.2.98",
     "vue-loading-overlay": "^3.2.0",
     "vue-meta": "1.5.8",
