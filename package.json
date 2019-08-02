@@ -43,6 +43,7 @@
     "moment-timezone": "^0.5.23",
     "normalize.css": "8.0.1",
     "nprogress": "0.2.0",
+    "sweet-modal-vue": "^2.0.0",
     "vee-validate": "^2.2.2",
     "vue": "2.6.6",
     "vue-bus": "^1.2.0",
