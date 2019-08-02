@@ -5,10 +5,7 @@
         <div v-if="hover">
           <div>
             <router-link
-              :to="{
-                name: 'download',
-                params: { myProperty: sensor.MAC, uuid: sensor.thingName },
-              }"
+              :to="{ name: 'download', params: { myProperty: sensor.MAC } }"
               tag="button"
               class="btn btn-sm btn-outline-primary with-icon float-right"
             >
@@ -28,9 +25,9 @@
     </div>
   </div>
 </template>
+
 <script>
 import { MapPinIcon, DownloadCloudIcon } from 'vue-feather-icons'
-
 export default {
   name: 'SensordItem',
   components: {
