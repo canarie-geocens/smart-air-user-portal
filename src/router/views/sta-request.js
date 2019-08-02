@@ -1,58 +1,24 @@
 import axios from 'axios'
 import moment from 'moment';
-import wellknown from "wellknown";
 
-const staURL = 'https://canada-geocens-aq-sta.sensorup.com/v1.0'
+const staURL =  process.env.VUE_APP_STA_URL
+const badRequest = 'Something in your request is not correct. It could be the content of the JSON or it could be the server endpoint is not expecting this content'
+const notFound = 'The resource you are looking for does not exist on the system'
+const internalServerError = 'We had a problem with our server. Try again later'
+const serviceUnavailable = 'We’re temporarially offline for maintanance. Please try again later'
+
 const _ = require('lodash');
-
-let requests = {
-
-
-    observations: async function (staClient, thingsId, filters, headers, options) {
-        options = options || {};
-        // options.progress = options.progress || {};
-
-        // let thingsIdSet = new Set(filters.thing.map(thing => thing['@iot.id']));
-        // let observedPropertiesIdSet = new Set(filters.observedProperty.map(op => op['@iot.id']));
-        let timeRangeMomentArray = filters.timeRange && _.includes(filters.timeRange, ' to ') ? filters.timeRange.split(' to ').map(date => moment(date)) : null;
-        let hasFeatureOfInterestHeaders = _.filter(headers, header => header.entity === 'featureOfInterest').length > 0;
-
-        let datastreams = (await staClient.getEntities('datastream', {
-            retrieveAll: true,
-            query: {
-                '$expand': 'Thing/Locations,ObservedProperty,Sensor',
-                '$filter': timeRangeMomentArray ? `Datastreams/Observations/phenomenonTime ge ${timeRangeMomentArray[0].toISOString()} and Datastreams/Observations/phenomenonTime le ${timeRangeMomentArray[1].endOf('day')
-                        .toISOString()} and properties/deviceId eq '${thingsId}' and Datastreams/ObservedProperty/name eq 'humidity'`
-                    : null,
-            }
-        })).value;
-        // datastreams = datastreams.filter(d => {
-        //     if (thingsIdSet.size > 0) {
-        //         if (!thingsIdSet.has(d.Thing['@iot.id'])) {
-        //             return false;
-        //         }
-        //     }
-        //     if (observedPropertiesIdSet.size > 0) {
-        //         if (!observedPropertiesIdSet.has(d.ObservedProperty['@iot.id'])) {
-        //             return false;
-        //         }
-        //     }
-        //     return true;
-        // });
-
-    }
-}
-
 
 export default {
 
-    requests,
+    statusCode : 0,
     requiredAction : 'download',
     requiredFOI : false,
     requiredDataStreams: false,
     requiredObservations: false,
     requiredSensors: false,
     requiredObservedProperties: false,
+
     async getSpecificThing(thingsId, obsrvedProperttyArray, timeRange, selectedFilters,option) {
         this.requiredAction = option;
         selectedFilters.forEach(filter => {
@@ -73,7 +39,7 @@ export default {
                     this.requiredObservedProperties = true;
                     break;
             }
-        })
+        });
 
         let returnedData = [];
         let returnedRecord = {};
@@ -84,162 +50,87 @@ export default {
             `${staURL}/Things?$filter=properties/deviceId eq '${thingsId}'&$expand=Datastreams,Locations,Datastreams/ObservedProperty,Datastreams/Sensor`
         )
 
-        selectedFilters.forEach(i => {
-            key.push(i['display'])
+        this.statusCode = specificThing.status // Error handling
 
-        })
+        if(this.statusCode === 200){ // Response is successfully returned
+            selectedFilters.forEach(i => {
+                key.push(i['display'])
 
-        key.forEach(selectedFilter => {
-            switch (selectedFilter) {
-                case 'Thing Name':
-                    returnedRecord[selectedFilter] = specificThing.data.value[0].name;
-                    break;
-                case 'Thing Description':
-                    returnedRecord[selectedFilter] = specificThing.data.value[0].description;
-                    break;
-                case 'Location Name':
-                    returnedRecord[selectedFilter] = specificThing.data.value[0]['Locations'][0].name;
-                    break;
-                case 'Location Description':
-                    returnedRecord[selectedFilter] = specificThing.data.value[0]['Locations'][0].description;
-                    break;
-                case 'Location Encoding Type':
-                    returnedRecord[selectedFilter] = specificThing.data.value[0]['Locations'][0].encodingType;
-                    break;
-                case 'Location WKT':
-                    returnedRecord[selectedFilter] = specificThing.data.value[0]['Locations'][0].location ? wellknown.stringify(specificThing.data.value[0]['Locations'][0].location) : '';
-                    break;
-                case 'Location GeoJSON': {
-                    returnedRecord[selectedFilter] = specificThing.data.value[0]['Locations'][0].location ? JSON.stringify(specificThing.data.value[0]['Locations'][0].location) : '';
-                    break;
-                }
-                // case 'Thing Description':
-                //     returnedRecord[selectedFilter] = specificThing.data.value[0].description;
-                //     break;
-                // case 'Thing Description':
-                //     returnedRecord[selectedFilter] = specificThing.data.value[0].description;
-                //     break;
-            }
-        });
+            })
 
-        // returnedData.push(returnedRecord)
+            key.forEach(selectedFilter => {
+               // Returning const values for each observation such as thing name for PM2.5 observation
+                switch (selectedFilter) {
+                    case 'Thing Name':
+                        returnedRecord[selectedFilter] = specificThing.data.value[0].name;
+                        break;
+                    case 'Thing Description':
+                        returnedRecord[selectedFilter] = specificThing.data.value[0].description;
+                        break;
+                    case 'Location Name':
+                        returnedRecord[selectedFilter] = specificThing.data.value[0]['Locations'][0].name;
+                        break;
+                    case 'Location Description':
+                        returnedRecord[selectedFilter] = specificThing.data.value[0]['Locations'][0].description;
+                        break;
+                    case 'Location Encoding Type':
+                        returnedRecord[selectedFilter] = specificThing.data.value[0]['Locations'][0].encodingType;
+                        break;
 
-
-        // To return Datasteam Ids, filtered or selected by the user
-        let datastreams = specificThing.data.value[0].Datastreams;
-
-        if (obsrvedProperttyArray.length === 0) {
-            obsrvedProperttyArray = ["Humidity", "Temperature", "PM2.5"]
-        }
-        obsrvedProperttyArray.forEach(opv => {
-            let dtsId = null
-            datastreams.forEach(obj => {
-                let strName = obj.name
-                if (strName.includes(opv)) {
-                    dtsId = obj['@iot.id']
-                }
-            });
-            datastreamIds[opv] = dtsId
-        })
-
-        let timeRangeMomentArray = timeRange && _.includes(timeRange, ' to ') ? timeRange.split(' to ').map(date => moment(date)) : null;
-        for (var dId in datastreamIds) {
-            // if(this.requiredFOI){
-            //     this.getFeatureOfInterest(datastreamIds[dId],timeRangeMomentArray,selectedFilters);
-            // }
-            if (datastreamIds.hasOwnProperty(dId)) {
-                let obsJSON = await axios.get(
-                    `${staURL}/Datastreams(${datastreamIds[dId]})/Observations`,
-                    {
-                        params: {
-                            $count: false,
-                            $filter: timeRangeMomentArray ? `Datastreams/Observations/phenomenonTime ge ${timeRangeMomentArray[0].toISOString()} and Datastreams/Observations/phenomenonTime le ${timeRangeMomentArray[1].endOf('day').toISOString()}`
-                                : null,
-                            // $top: 10, //check
-                            $top: this.requiredAction === 'download' ? 2000 : 10,
-                            $expand: 'FeatureOfInterest,Datastream,Datastream/Sensor,Datastream/ObservedProperty'
-                        },
+                    case 'Location GeoJSON': {
+                        returnedRecord[selectedFilter] = specificThing.data.value[0]['Locations'][0].location ? JSON.stringify(specificThing.data.value[0]['Locations'][0].location) : '';
+                        break;
                     }
-                )
-                let observations = obsJSON.data.value;
-                let requiredPhenomenonTime = false;
-                let requiredresult = false;
-                key.forEach(selectedFilter => {
-                    switch (selectedFilter) {
-                        case 'Observation Phenomenon Time':
-                            requiredPhenomenonTime = !requiredPhenomenonTime;
-                            break;
-                        case 'Observation Result':
-                            requiredresult = !requiredresult;
-                            break;
+                }
+
+            });
+
+
+            let datastreams = specificThing.data.value[0].Datastreams; // Return all the datastreams for each Thing for example some Thing object might have one ,two, or three datastreams
+
+            // If user unselect all of observed properties, all of them will be considered.
+            if (obsrvedProperttyArray.length === 0) {
+                obsrvedProperttyArray = ["Humidity", "Temperature", "PM2.5"]
+            }
+
+            obsrvedProperttyArray.forEach(opv => {
+                let dtsId = null
+                datastreams.forEach(obj => {
+                    let strName = obj.name
+                    if (strName.includes(opv)) {
+                        dtsId = obj['@iot.id'] // Return the ID of each selected datastream, e.g., return 123 for datastream related to the temperature
                     }
                 });
-                if (requiredPhenomenonTime && !requiredresult) {
-                      observations.forEach(obs => {
-                          var returnedRecordTemp = {};
-                          var foiTemp = {};
-                          var datastreamTemp = {};
-                          var sensorTemp = {};
-                          var observedPropertiesTemp = {};
-                          returnedRecordTemp['Observation Phenomenon Time'] = obs.phenomenonTime;
-                          returnedRecordTemp['Observed Property Name'] = dId;
-                          if(this.requiredFOI){
-                              foiTemp = this.getFeatureOfInterest(obs,selectedFilters)
-                          }
+                datastreamIds[opv] = dtsId // Store all the three or selected datastreamIds for the selected observed properties
+            })
 
-                          if(this.requiredDataStreams){
-                              datastreamTemp = this.getDatastream(obs,selectedFilters)
-                          }
+            let timeRangeMomentArray = timeRange && _.includes(timeRange, ' to ') ? timeRange.split(' to ').map(date => moment(date)) : null;
 
-                          if(this.requiredSensors){
-                              sensorTemp = this.getSensor(obs,selectedFilters)
-                          }
+            // Returning observations for each datastream
+            for (var dId in datastreamIds) {
+                if (datastreamIds.hasOwnProperty(dId)) {
+                    let obsJSON = await axios.get(
+                        `${staURL}/Datastreams(${datastreamIds[dId]})/Observations`,
+                        {
+                            params: {
+                                $count: false,
+                                $filter: timeRangeMomentArray ? `Datastreams/Observations/phenomenonTime ge ${timeRangeMomentArray[0].toISOString()} and Datastreams/Observations/phenomenonTime le ${timeRangeMomentArray[1].endOf('day').toISOString()}`
+                                    : null,
+                                // $top: 10,
+                                $top: this.requiredAction === 'download' ? 2000 : 10, // For preview mode we just show the 10 latest observations while for download mode 2000 observations will be selected
+                                $expand: 'FeatureOfInterest,Datastream,Datastream/Sensor,Datastream/ObservedProperty'
+                            },
+                        }
+                    )
 
-                          if(this.requiredObservedProperties){
-                              observedPropertiesTemp = this.getObservedProperties(obs,selectedFilters)
-                          }
-
-                          var computedObj = {...returnedRecordTemp,...returnedRecord,...foiTemp,...datastreamTemp,...sensorTemp,...observedPropertiesTemp}
-
-                          returnedData.push(computedObj)
-                      });
-                }
-                else if (!requiredPhenomenonTime && requiredresult){
+                    let observations = obsJSON.data.value;
                     observations.forEach(obs => {
                         var returnedRecordTemp = {}
                         var foiTemp = {};
                         var datastreamTemp = {};
                         var sensorTemp = {};
                         var observedPropertiesTemp = {};
-                        returnedRecordTemp['Observation Result'] = obs.result;
-                        returnedRecordTemp['Observed Property Name'] = dId;
-                        if(this.requiredFOI){
-                            foiTemp = this.getFeatureOfInterest(obs,selectedFilters)
-                        }
-                        if(this.requiredDataStreams){
-                            datastreamTemp = this.getDatastream(obs,selectedFilters)
-                        }
 
-                        if(this.requiredSensors){
-                            sensorTemp = this.getSensor(obs,selectedFilters)
-                        }
-
-                        if(this.requiredObservedProperties){
-                            observedPropertiesTemp = this.getObservedProperties(obs,selectedFilters)
-                        }
-
-                        var computedObj = {...returnedRecordTemp,...returnedRecord,...foiTemp,...datastreamTemp,...sensorTemp,...observedPropertiesTemp}
-
-                        returnedData.push(computedObj)
-
-                    });
-                }else if (requiredPhenomenonTime && requiredresult) {
-                    observations.forEach(obs => {
-                        var returnedRecordTemp = {}
-                        var foiTemp = {};
-                        var datastreamTemp = {};
-                        var sensorTemp = {};
-                        var observedPropertiesTemp = {};
                         returnedRecordTemp['Observation Phenomenon Time'] = obs.phenomenonTime;
                         returnedRecordTemp['Observation Result'] = obs.result;
                         returnedRecordTemp['Observed Property Name'] = dId;
@@ -262,14 +153,31 @@ export default {
                         var computedObj = {...returnedRecordTemp,...returnedRecord,...foiTemp,...datastreamTemp,...sensorTemp,...observedPropertiesTemp}
                         returnedData.push(computedObj)
                     });
-                }
 
+                }
             }
+            return [returnedData,"Successful"]
         }
-        return returnedData
+        else if(this.statusCode === 400)
+        {
+            return [null,badRequest]
+        }
+        else if(this.statusCode === 404)
+        {
+            return [null,notFound]
+        }
+        else if(this.statusCode === 500)
+        {
+            return [null,internalServerError]
+        }
+        else if(this.statusCode === 503)
+        {
+            return [null,serviceUnavailable]
+        }
 
     },
 
+    // To return desired values stored on the "ObservedProperties"
     getObservedProperties(observation,selectedFilters){
         let observedProperty ={}
         selectedFilters.forEach(filter => {
@@ -283,12 +191,12 @@ export default {
                 case 'Observed Property Definition':
                     observedProperty[filter.display] = observation.Datastream.ObservedProperty.definition
                     break;
-
             }
         })
         return observedProperty
     },
 
+    // To return desired values stored on the "Sensor"
     getSensor(observation,selectedFilters){
         let sensorObject ={}
         selectedFilters.forEach(filter => {
@@ -310,6 +218,7 @@ export default {
         return sensorObject
     },
 
+    // To return desired values stored on the "Observation/Datastream"
     getDatastream(observation,selectedFilters){
         let datastreamObject ={}
         selectedFilters.forEach(filter => {
@@ -335,6 +244,7 @@ export default {
         return datastreamObject
     },
 
+    // To return desired values stored on the "FeatureOfInterest"
     getFeatureOfInterest(observation,selectedFilters){
          let foiObject ={}
 
@@ -349,78 +259,22 @@ export default {
                 case 'Feature Of Interest Encoding Type':
                     foiObject[filter.display] = observation.FeatureOfInterest.encodingType
                     break;
-                case 'Feature Of Interest WKT':
-                    foiObject[filter.display] = observation.FeatureOfInterest.feature ? wellknown.stringify(observation.FeatureOfInterest.feature) : '';
-                    break;
                 case 'Feature Of Interest GeoJSON':
-                    foiObject[filter.display] = observation.FeatureOfInterest.feature ? JSON.stringify(observation.FeatureOfInterest.feature) : '';
+                    {
+                        var obf=JSON.stringify(observation.FeatureOfInterest.feature);
+                        if(obf.includes("="))
+                        {
+                            obf = obf.substring(1, obf.length);
+
+                        }
+                        console.log(obf);
+                        foiObject[filter.display] = observation.FeatureOfInterest.feature ? obf : '';
+                    }
                     break;
 
             }
         })
         return foiObject
     },
-
-
-    // getThingsList() {
-    //     return axios.get(`${staURL}/Things`)
-    // },
-    //
-    // getObservations(datastreamId) {
-    //     let observations = axios.get(
-    //         `${staURL}/Datastreams(${datastreamId})/Observations`
-    //     )
-    //     return observations
-    // },
-    // getThingsName(datastreamId) {
-    //     let Thing = axios.get(
-    //         `${staURL}/Datastreams(${datastreamId})/Thing`
-    //     )
-    //     return Thing
-    // },
-    // getObservedProperty(datastreamId) {
-    //     let ObservedProperty = axios.get(
-    //         `${staURL}/Datastreams(${datastreamId})/ObservedProperty`
-    //     )
-    //     return ObservedProperty
-    // },
-    // async getTest(thingsId, obsrvedProperttyArray) {
-    //     // let timeRangeMomentArray = timeRange && _.includes(timeRange, ' to ') ? timeRange.split(' to ').map(date => moment(date)) : null;
-    //     //
-    //     // let specificThing = axios.get(
-    //     //     `${staURL}/Things`,{
-    //     //         params: {
-    //     //             $expand:
-    //     //                 'Datastreams/Observations($top=30),Datastreams/Observations/FeatureOfInterest,Datastreams/ObservedProperty',
-    //     //             $filter: timeRangeMomentArray ? `Datastreams/Observations/phenomenonTime ge ${timeRangeMomentArray[0].toISOString()} and Datastreams/Observations/phenomenonTime le ${timeRangeMomentArray[1].endOf('day').toISOString()} and properties/deviceId eq '${ thingsId }'`
-    //     //                 : null,
-    //     //         },
-    //     //     })
-    //     // // `${staURL}/Things?$filter=properties/deviceId eq '${thingsId}'&$expand=Datastreams/Observations,Datastreams/Observations/FeatureOfInterest,Datastreams/ObservedProperty`
-    //     // return specificThing
-    //
-    //
-    //     let datastreamIds = {}
-    //     let specificThing = await axios.get(
-    //         `${staURL}/Things?$filter=properties/deviceId eq '${thingsId}'&$expand=Datastreams`
-    //     )
-    //     let datastreams = specificThing.data.value[0].Datastreams;
-    //
-    //
-    //     if (obsrvedProperttyArray) {
-    //         obsrvedProperttyArray.forEach(opv => {
-    //             let dtsId = null
-    //             datastreams.forEach(obj => {
-    //                 let strName = obj.name
-    //                 if (strName.includes(opv)) {
-    //                     dtsId = obj['@iot.id']
-    //                 }
-    //             });
-    //             datastreamIds[opv] = dtsId
-    //         })
-    //     }
-    //     return datastreamIds
-    //
-    // }
 
 }
