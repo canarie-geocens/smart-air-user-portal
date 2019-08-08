@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import DownloadExcel from 'vue-json-excel'
+import DownloadExcel from './JsonExcelCustomized'
 export default {
   name: 'StaDataExporter',
   components: {
