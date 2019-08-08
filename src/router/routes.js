@@ -10,6 +10,11 @@ export default [
     component: () => lazyLoadView(import('@views/sensors')),
   },
   {
+    path: '/sensors/download/:myProperty',
+    name: 'download',
+    component: () => lazyLoadView(import('@views/download')),
+  },
+  {
     path: '/sensors/register',
     name: 'register',
     component: () => lazyLoadView(import('@views/register')),

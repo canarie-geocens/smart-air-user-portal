@@ -24,8 +24,12 @@ import 'vue-loading-overlay/dist/vue-loading.css'
 
 import VeeValidate from 'vee-validate'
 
-Vue.use(VeeValidate)
+import flatPickr from 'vue-flatpickr-component'
+import 'flatpickr/dist/flatpickr.css'
 
+Vue.use(VeeValidate, {
+  fieldsBagName: 'vvFields',
+})
 Vue.component('v-slider', VueSlider)
 Vue.component('loading', Loading)
 
@@ -36,6 +40,8 @@ Vue.use(BootstrapVue)
 Vue.use(VueMoment, {
   moment,
 })
+
+Vue.use(flatPickr)
 
 Vue.component('multiselect', Multiselect)
 
