@@ -4,14 +4,7 @@
             <div class="withSubNavbar">
                 <nav class="navbar navbar-light bg-white">
                     <h2 class="navbar-brand">
-                        <router-link
-                            to="/sensors"
-                            tag="button"
-                            class="btn btn-link"
-                            style="font-size: 1.25rem"
-                        >Sensor List</router-link>
-                        / Device {{ recievedProperty }} / Export
-                    </h2>
+                        <router-link to="/sensors" tag="button" id="test" class="btn navbar-brand btn-link h2" >Sensor List</router-link>/ Device {{ recievedProperty }} / Export</h2>
                 </nav>
                 <div v-cloak id="main" style="overflow-x: hidden;">
                     <div class="row">
@@ -31,7 +24,6 @@
                                                              :options="observedPropertiesOptions"
                                                              :close-on-select="true" :searchable="false"
                                                              :show-labels="true" :multiple="true"
-                                                             :hide-selected="true"
                                                              placeholder="Select">
 x
                                                 </multiselect>
@@ -62,7 +54,7 @@ x
                                 <div class="card-body">
                                     <div class="row pt-3 mt-2">
                                         <div class="col-xl-12">
-                                            <button :id="[ isLoading ? 'disabled' : 'enabled' ]" class="btn btn-primary"  style="margin-bottom: 4px"
+                                            <button :id="[ isLoading ? 'disabled' : 'enabled' ]" class="btn btn-primary" style="margin-bottom: 4px"
                                                     @click="setPreviewAction()">Show Preview
                                             </button>
                                             <sta-data-exporter
@@ -123,7 +115,7 @@ x
                 statusResult: '',
                 requiredAction: 'preview',
                 tableData: [{}],
-                tableDataCSV: [{}],
+                tableDataCSV: null,
                 headerColumns: [
                     staHeaders.table['observation-phenomenonTime']['display'],
                     staHeaders.table['observation-result']['display'],
@@ -132,13 +124,14 @@ x
                 ],
 
                 observedPropertiesValue: ['Humidity', 'Temperature', 'PM2.5'],
-                observedPropertiesOptions: ['Humidity', 'Temperature', 'PM2.5'],
+                observedPropertiesCompleteSet: ['Humidity', 'Temperature', 'PM2.5'],
+
 
                 staHeadersValues: {
                     observation: [staHeaders.table['observation-phenomenonTime'], staHeaders.table['observation-result']],
-                    location: [staHeaders.table['location-name'], staHeaders.table['location-description'], staHeaders.table['location-location-geojson']],
-                    datastream: [staHeaders.table['datastream-uom-symbol']],
                     observedProperty: [staHeaders.table['observedProperty-description']],
+                    datastream: [staHeaders.table['datastream-uom-symbol']],
+                    location: [staHeaders.table['location-name'], staHeaders.table['location-description'], staHeaders.table['location-location-geojson']],
                     sensor: [staHeaders.table['sensor-name']],
                 },
 
@@ -167,6 +160,12 @@ x
         },
         computed: {
 
+            observedPropertiesOptions (){
+                return this.arr_diff (this.observedPropertiesCompleteSet, this.observedPropertiesValue);
+            },
+
+
+
             exportFileName() {
                 let prefix = 'SensorUp AirQ_Device ' + this.recievedProperty + ' sta_data';
                 return this.timeRangeFilterDate ? prefix + '_' + this.timeRangeFilterDate : prefix
@@ -184,6 +183,29 @@ x
             this.recievedProperty = this.$route.params.myProperty;
         },
         methods: {
+
+            arr_diff (a1, a2) {
+
+                var a = [], diff = [];
+
+                for (var i = 0; i < a1.length; i++) {
+                    a[a1[i]] = true;
+                }
+
+                for (var i = 0; i < a2.length; i++) {
+                    if (a[a2[i]]) {
+                        delete a[a2[i]];
+                    } else {
+                        a[a2[i]] = true;
+                    }
+                }
+
+                for (var k in a) {
+                    diff.push(k);
+                }
+
+                return diff;
+            },
 
             // Starting spinner and disable the "Export CSV" button
             startProgress: function () {
@@ -214,7 +236,6 @@ x
                 this.previewTableSettings.colHeaders = _.flatMap(newValue, entity => {
                     return entity.map(o => o.display);
                 });
-
                 this.headerColumns = _.flatMap(newValue, entity => {
                     return entity.map(o => o.display);
                 });
@@ -263,6 +284,7 @@ x
 
                 if (option === 'download') {
                     await staRequests.getSpecificThing(this.recievedProperty, this.observedPropertiesValue, this.timeRangeFilterDate, selectedFilters, option).then(response => {
+
                         this.tableDataCSV = response[0];
                         this.statusResult = response[1];
                     });
@@ -274,6 +296,17 @@ x
 </script>
 <style lang="scss">
     @import "~bootstrap/scss/bootstrap";
+
+    .navbar-brand.btn-link.h2 {
+        text-decoration: underline;
+        margin-right:0px;
+        color: blue;
+    }
+
+    .navbar-brand.btn-link.h2:hover{
+        text-decoration: underline;
+        color: red;
+    }
 
     #disabled {
         pointer-events: none;
