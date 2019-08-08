@@ -150,6 +150,5 @@ let table = _(headers)
   .value()
 
 export default {
-  headers: headers,
-  table: table,
+  table,
 }
