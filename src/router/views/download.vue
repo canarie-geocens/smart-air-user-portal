@@ -3,7 +3,15 @@
         <main-content>
             <div class="withSubNavbar">
                 <nav class="navbar navbar-light bg-white">
-                    <h2 class="navbar-brand"> Device {{ recievedProperty }} / Export</h2>
+                    <h2 class="navbar-brand">
+                        <router-link
+                            to="/sensors"
+                            tag="button"
+                            class="btn btn-link"
+                            style="font-size: 1.25rem"
+                        >Sensor List</router-link>
+                        / Device {{ recievedProperty }} / Export
+                    </h2>
                 </nav>
                 <div v-cloak id="main" style="overflow-x: hidden;">
                     <div class="row">
@@ -23,6 +31,7 @@
                                                              :options="observedPropertiesOptions"
                                                              :close-on-select="true" :searchable="false"
                                                              :show-labels="true" :multiple="true"
+                                                             :hide-selected="true"
                                                              placeholder="Select">
 x
                                                 </multiselect>
@@ -53,7 +62,7 @@ x
                                 <div class="card-body">
                                     <div class="row pt-3 mt-2">
                                         <div class="col-xl-12">
-                                            <button class="btn btn-primary" style="margin-bottom: 4px"
+                                            <button :id="[ isLoading ? 'disabled' : 'enabled' ]" class="btn btn-primary"  style="margin-bottom: 4px"
                                                     @click="setPreviewAction()">Show Preview
                                             </button>
                                             <sta-data-exporter
@@ -79,7 +88,7 @@ x
                                                 This preview table shows only a subset of the data
                                             </div>
                                             <div class="mt-2 mb-4"
-                                                 style="width: 100%; height: 600px; overflow-x: hidden">
+                                                 style="width: 100%; height: 750px; overflow-x: hidden">
                                                 <hot-table :settings="previewTableSettings"></hot-table>
                                             </div>
                                         </div>

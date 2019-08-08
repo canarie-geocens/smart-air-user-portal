@@ -114,7 +114,7 @@ export default {
                         {
                             params: {
                                 $count: false,
-                                $filter: timeRangeMomentArray ? `Datastreams/Observations/phenomenonTime ge ${timeRangeMomentArray[0].toISOString()} and Datastreams/Observations/phenomenonTime le ${timeRangeMomentArray[1].endOf('day').toISOString()}`
+                                $filter: timeRangeMomentArray ? `phenomenonTime ge ${timeRangeMomentArray[0].toISOString()} and phenomenonTime le ${timeRangeMomentArray[1].endOf('day').toISOString()}`
                                     : null,
                                 // $top: 10,
                                 $top: this.requiredAction === 'download' ? 2000 : 10, // For preview mode we just show the 10 latest observations while for download mode 2000 observations will be selected
