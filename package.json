@@ -1,5 +1,5 @@
 {
-  "name": "canarie-geocens-user-portal",
+  "name": "smart-air-geocens-user-portal",
   "version": "1.0.0",
   "scripts": {
     "dev": "vue-cli-service serve",

@@ -1,6 +1,6 @@
-# Canarie GeoCENS Project User Portal
+# Smart Air (GeoCENS) Project User Portal
 
-> Canarie GeoCENS Smart Air User Portal [(Live)](https://geocens-smart-air.dev.sensorup.com/)
+> Smart Air (GeoCENS) User Portal [(Live)](https://geocens.sensorup.com/)
 
 ## Getting started
 
