@@ -38,7 +38,7 @@
     "chance": "^1.0.18",
     "daterangepicker": "^3.0.3",
     "handsontable": "^7.1.0",
-    "lodash": "4.17.11",
+    "lodash": "4.17.13",
     "mapbox-gl": "^0.53.0-beta.1",
     "moment-timezone": "^0.5.23",
     "normalize.css": "8.0.1",
