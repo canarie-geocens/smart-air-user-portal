@@ -74,7 +74,7 @@
     "babel-jest": "24.1.x",
     "cross-env": "5.2.x",
     "eslint-plugin-vue": "5.1.x",
-    "express": "4.16.x",
+    "express": "4.17.x",
     "hygen": "2.1.2",
     "imagemin-lint-staged": "0.4.x",
     "lint-staged": "8.1.x",
